@@ -10,11 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-scroll-area": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@tanstack/react-query": "^5.56.2",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.5.0",
     "@types/bun": "^1.1.9",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -45,5 +48,8 @@
     "typescript": "^5.6.2",
     "typescript-eslint": "^8.6.0",
     "vite": "^5.4.6"
-  }
+  },
+  "trustedDependencies": [
+    "@tsparticles/engine"
+  ]
 }

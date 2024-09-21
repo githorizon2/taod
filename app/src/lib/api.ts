@@ -1,10 +1,15 @@
 import ky from "ky";
 
-export type CommandOutput = { result: string };
+export type CommandError = {
+  status: "failed";
+  error: { exitCode: number; stdout: string; stderr: string; name: string };
+};
+export type CommandOutput = { status: "success"; result: string };
+export type SendResult = CommandError | CommandOutput;
 
 export async function sendCommand(command: string) {
   const result = await ky
-    .post<CommandOutput>("http://localhost:8080/send", {
+    .post<SendResult>("http://localhost:8080/send", {
       json: { command: command },
     })
     .json();

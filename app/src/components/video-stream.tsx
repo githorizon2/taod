@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { type FC, useCallback, useEffect, useState } from "react";
 import useInterval from "react-useinterval";
 import {
@@ -6,11 +7,9 @@ import {
   STREAM_OFF_INDICATION_SEC,
   STREAM_SLEEPING_INDICATION_SEC,
   VIDEO_ID,
-  videoStateIndicator,
 } from "./consts";
 import { WHEPClient } from "./media-mtx-webrtc";
 import type { StreamingState } from "./types";
-import { cn } from "@/lib/utils";
 
 const videoURL = "http://localhost:8889";
 
@@ -77,7 +76,7 @@ export const VideoStream: FC<VideoStreamProps> = ({
   return (
     <div
       className={cn(
-        "aspect-video border-8 transition-colors duration-300 h-full w-full rounded-xl",
+        "border-8 transition-colors duration-300 h-full w-full rounded-xl",
         streamingState === "on" ? "border-green-500" : "border-red-500"
       )}
     >
@@ -88,6 +87,7 @@ export const VideoStream: FC<VideoStreamProps> = ({
       <video
         id={`${VIDEO_ID}-${device}`}
         className="rounded-md size-full"
+        // controls={controls ?? false}
         controls={false}
         muted
         autoPlay

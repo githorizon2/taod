@@ -1,15 +1,15 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { sendCommand, type SendResult } from "@/lib/api";
+import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PasswordDialog } from "./password-dialog";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { CommandOutput, sendCommand } from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export function LockedSshTerminal() {
   const [currentCommand, setCurrentCommand] = useState<string>("");
-
   const [isLocked, setIsLocked] = useState(true);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingCommand, setPendingCommand] = useState("");
@@ -20,9 +20,10 @@ export function LockedSshTerminal() {
     mutate,
     data: output,
     isPending,
-  } = useMutation<CommandOutput>({
-    mutationFn: async () => {
-      return sendCommand(pendingCommand);
+  } = useMutation<SendResult, unknown, string>({
+    mutationFn: async (command) => {
+      const result = await sendCommand(command);
+      return result;
     },
   });
 
@@ -30,12 +31,12 @@ export function LockedSshTerminal() {
     if (e.key === "Enter") {
       const command = e.currentTarget.value;
       if (isLocked) {
-        console.log("locked");
-
         setPendingCommand(command);
         setShowPasswordDialog(true);
       } else {
-        executeCommand(command);
+        setCurrentCommand(command);
+        setPendingCommand("");
+        mutate(command);
       }
       e.currentTarget.value = "";
     }
@@ -46,7 +47,7 @@ export function LockedSshTerminal() {
       setIsLocked(false);
       setShowPasswordDialog(false);
       setCurrentCommand(pendingCommand);
-      mutate();
+      mutate(pendingCommand);
       setPendingCommand("");
     } else {
       toast.error("Incorrect password. Access denied.");
@@ -62,9 +63,10 @@ export function LockedSshTerminal() {
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+  console.log(output);
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 bg-gray-900 text-green-400 font-mono rounded-lg shadow-lg">
+    <div className="w-full mx-auto p-4 bg-gray-900 text-green-400 font-mono rounded-lg shadow-lg">
       <ScrollArea className="h-40 mb-4 overflow-hidden" ref={scrollAreaRef}>
         <AnimatePresence mode="wait">
           {currentCommand && (
@@ -89,12 +91,17 @@ export function LockedSshTerminal() {
                 </motion.div>
               ) : (
                 <motion.pre
-                  className="whitespace-pre-wrap text-sm"
+                  className={cn(
+                    "whitespace-pre-wrap text-sm text-start",
+                    output?.status === "failed" && "text-red-700"
+                  )}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  {output?.result}
+                  {output?.status === "failed"
+                    ? output.error.name
+                    : output?.result}
                 </motion.pre>
               )}
             </motion.div>

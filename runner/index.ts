@@ -13,11 +13,11 @@ app.use(cors());
 async function sendCommand(value: string) {
   try {
     logger.debug(`running command: ${value}`);
-    const result = await $`echo "${value}"`.text();
-    return result;
+    const result = await $`${value}`;
+    return { status: "success", result };
   } catch (error) {
     logger.error({ message: "command resulted error", error });
-    return error;
+    return { status: "failed", error };
   }
 }
 
@@ -26,7 +26,7 @@ app.post("/send", async (req, res) => {
   if (command) {
     logger.info(`received send reqeuest with: ${command}`);
     const result = await sendCommand(command);
-    res.send({ result });
+    res.send(result);
   } else {
     logger.warn("recieved sedn reqeust without command parameter");
     res.status(400).send('missing parameter "command" in request body');
