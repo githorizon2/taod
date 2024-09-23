@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { VideoStream } from "@/components/video-stream";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Logo } from "./components/logo";
+import { Particles } from "./components/particles/particles";
 
 import "./App.css";
 
@@ -11,7 +12,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster />
-      <div className="z-1 size-full flex flex-col gap-2 items-center ">
+      <div className="relative z-10 size-full flex flex-col gap-2 items-center ">
         <Logo />
         <div className="flex-1">
           <VideoStream device={0} />
@@ -19,6 +20,7 @@ function App() {
 
         {/* <LockedSshTerminal /> */}
       </div>
+      <Particles />
     </QueryClientProvider>
   );
 }
